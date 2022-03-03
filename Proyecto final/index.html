@@ -5,13 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://bootswatch.com/5/united/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <title>Segunda pre entrega</title>
 </head>
 <body>
     <h1>Bookshelf &#128218;</h1>
-    <h3><small class="text-muted">Un lugar donde poder seguir tus lecturas</small> <u>mucho más fácil</u></h3>
+    <h3><small class="text-muted">Un lugar donde seguir tus lecturas es</small> <u>mucho más fácil</u></h3>
 
-    <div class="container-l border border-3 rounded mx-5 p-2" id="divForm">
+    <div class="container-l border border-3 rounded mx-5 mt-4 p-2" id="divForm">
         <form id="idForm">
             <legend> Añadir un libro a tu colección </legend>
             <div class="form-group mb-2">
@@ -22,22 +23,27 @@
                 <label class="form-label" for="bookAuthor">Autor</label>
                 <input type="text" class="form-control" name="autorLibro" id="bookAuthor" placeholder="Ingrese el autor del libro">
             </div>
-            <label class="form-label" for="estadoLibro">Estado</label>
-            <div class="form-group mb-3">
-                <input type="radio" class="btn-check" name="estadoLibro" id="btnPorLeer" value="porLeer" checked>
-                <label class="btn btn-outline-primary" for="btnPorLeer">Por leer</label>
+            <div class="form-group mb-2">
+                <label for="exampleTextarea" class="form-label">Comentarios</label>
+                <textarea class="form-control" id="bookComment" name="commentLibro" rows="3" maxlength="140"></textarea>
+              </div>
+            <label class="form-label" for="estadoLibro">Estado</label> <br>
+            <div class="btn-group form-group mb-3">
+                <input type="radio" class="btn-check" name="estadoLibro" id="btnPorLeer" value="por leer" checked>
+                <label class="btn btn-outline-primary btn-sm" for="btnPorLeer">Por leer</label>
 
                 <input type="radio" class="btn-check" name="estadoLibro" id="btnLeido" value="leido">
-                <label class="btn btn-outline-primary" for="btnLeido">Leído</label>
+                <label class="btn btn-outline-primary btn-sm" for="btnLeido">Leído</label>
             </div>
-            <button type="submit" class="btn btn-success btn-lg mb-3">Añadir a colección</button>
+            <br>
+            <button type="submit" class="btn btn-success mb-3">Añadir a colección</button>
         </form>
         
     </div>
     
-    <button class="btn btn-info btn-lg m-3" id="btnMostrarColeccion">Mostrar colección</button>
+    <button class="btn btn-info m-3" id="btnMostrarColeccion">Mostrar colección</button>
     
-    <div id="coleccionLibros" class="row row-cols-1 row-cols-md-3 g-4">
+    <div id="coleccionLibros" class="row cols-3 row-cols-md-3 g-4 gap-4 mx-3">
     </div>
 
     <script src="script.js"></script>
