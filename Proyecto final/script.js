@@ -16,8 +16,6 @@ if(localStorage.getItem('libros') !== null) {
     arrayLibros = JSON.parse(localStorage.getItem('libros'))
 } 
 
-console.log(arrayLibros)
-
 let formulario = document.getElementById("idForm")
 
 formulario.addEventListener('submit', (e) => {
@@ -40,7 +38,6 @@ let botonColeccion = document.getElementById("btnMostrarColeccion")
 let coleccionLibros = document.getElementById("coleccionLibros")
 let barraDeProgreso = document.getElementById("progressBar")
 
-
 // Mostrar colección
 botonColeccion.addEventListener ('click', () => {
     coleccionLibros.innerHTML = ' '
@@ -49,7 +46,7 @@ botonColeccion.addEventListener ('click', () => {
         coleccionLibros.innerHTML += `
         <div class="card h-105 p-0 col-4" id="libro${indice}" style="width: 20rem">
             <div class="card-header">
-                <mark><em>${libro.estado.toUpperCase()}</em></mark>
+                <span class="badge bg-${libro.estado == "leido" ? "success" : "secondary"}">${libro.estado.toUpperCase()}</span>
             </div>
             <div class="card-body">
                 <h4 class="card-title"><u>${libro.titulo}</u></h5>
@@ -82,6 +79,8 @@ botonColeccion.addEventListener ('click', () => {
         <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: ${porcentajeProgresoLectura}%;"></div>
     </div>
     `
+
+    
 })
 
 let botonEliminarColeccion = document.getElementById("btnEliminarColeccion")
@@ -103,3 +102,5 @@ botonEliminarColeccion.addEventListener('click', () => {
         }
     })
 })
+
+
