@@ -1,12 +1,15 @@
 const DateTime = luxon.DateTime
 
 class Libro{
-    constructor(titulo, autor, estado, update, comment) {
+    constructor(img, titulo, autor, genero, paginas, update, estado, verMas) {
+        this.img = img
         this.titulo = titulo
         this.autor = autor
-        this.estado = estado
+        this.genero = genero
+        this.paginas = paginas
         this.update = update
-        this.comment = comment
+        this.estado = estado
+        this.verMas = verMas
     }
 }
 
@@ -24,9 +27,22 @@ formulario.addEventListener('submit', (e) => {
     let estadoLibro = formulario.querySelector('input[name=estadoLibro]:checked').value
     const now = DateTime.now()
     let fechaActual = now.toLocaleString()
-    let libro = new Libro(datForm.get("tituloLibro"), datForm.get("autorLibro"), estadoLibro, fechaActual, datForm.get("commentLibro")) 
-    arrayLibros.push(libro)
-    localStorage.setItem('libros', JSON.stringify(arrayLibros))
+    let tituloLibro = datForm.get("libro").toLowerCase()
+    let tituloLibroQuery = tituloLibro.replace(/ /g, "_")
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=${tituloLibroQuery}&key=AIzaSyCvF_g4SBakVPdyfC_pgwC2dyxzHx761Wk`)
+    .then(response => response.json())
+    .then(data => {
+        let dataLibro = data.items[0].volumeInfo
+        let imgLibro;
+        try {
+            imgLibro = dataLibro.imageLinks.smallThumbnail
+        } catch {
+            console.error("NO ENCONTRADO")
+        }
+        let libro = new Libro(imgLibro, dataLibro.title, dataLibro.authors, dataLibro.categories, dataLibro.pageCount, fechaActual, estadoLibro, dataLibro.infoLink)
+        arrayLibros.push(libro)
+        localStorage.setItem('libros', JSON.stringify(arrayLibros))
+    })
     Toastify({
         text: "Libro añadido exitosamente",
         duration: 3000
@@ -37,11 +53,12 @@ formulario.addEventListener('submit', (e) => {
 let botonColeccion = document.getElementById("btnMostrarColeccion")
 let coleccionLibros = document.getElementById("coleccionLibros")
 let barraDeProgreso = document.getElementById("progressBar")
+let sectionFiltros = document.getElementById("seccionFiltros")
 
-// Mostrar colección
-botonColeccion.addEventListener ('click', () => {
+function showArray() {
     coleccionLibros.innerHTML = ' '
     barraDeProgreso.innerHTML = ' '
+    seccionFiltros.innerHTML = ' '
     arrayLibros.forEach((libro, indice) => { 
         coleccionLibros.innerHTML += `
         <div class="card h-105 p-0 col-4" id="libro${indice}" style="width: 20rem">
@@ -49,13 +66,17 @@ botonColeccion.addEventListener ('click', () => {
                 <span class="badge bg-${libro.estado == "leido" ? "success" : "secondary"}">${libro.estado.toUpperCase()}</span>
             </div>
             <div class="card-body">
-                <h4 class="card-title"><u>${libro.titulo}</u></h5>
+                <div class="text-center mb-2">
+                    <img src="${libro.img}" onerror="this.src='img/notFound.png'"></img>
+                </div>
+                <h2 class="card-title"><u>${libro.titulo}</u></h5>
                 <h5 class="card-text">Autor: ${libro.autor}</h3>
-                <p><small>${libro.comment}</small></p>
+                <h5 class="card-text">Género: ${libro.genero}</h3>
+                <p><small>Cantidad de páginas: ${libro.paginas}</small></p>
             </div>
             <div class="mx-5 mb-2 text-center gap-2">
-                <button class="btn btn-sm btn-dark">Editar</button>
-                <button class="btn btn-sm btn-danger" id="btnRemoveCard">Eliminar</button>
+                <a href="${libro.verMas}"><button class="btn btn-sm btn-info" target="_blank"> Ver Más </button></a>
+                <button class="btn btn-sm btn-danger btnEliminar" id="btnRemoveCard${indice}">Eliminar</button>
             </div>
             <div class="card-footer">
                 <small class="text-muted">Añadido el ${libro.update}</small>
@@ -68,6 +89,7 @@ botonColeccion.addEventListener ('click', () => {
             document.getElementById(`libro${indice}`).style["border"] = "2px solid #008209"
         }
     })
+
     // Porcentaje leidos
     let filtroLeidos = arrayLibros.filter(libro => libro.estado == "leido")
     let numeroLeidos = filtroLeidos.length
@@ -80,9 +102,57 @@ botonColeccion.addEventListener ('click', () => {
     </div>
     `
 
-    
+    // BOTONES FILTROS
+    sectionFiltros.innerHTML += `
+    <label><strong>Filtros</strong></label>
+    <div class="btn-group ml-5" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary" id="filtroAlfabetico">Orden Alfabético</button>
+        <button type="button" class="btn btn-secondary" id="filtroLectura">Estado de lectura</button>
+    </div>
+    `
+
+}
+
+
+/*
+function eliminarLibro(libro){
+    arrayLibros.findIndex(arrLibros => )
+}
+*/
+
+// MOSTRAR COLECCIÓN
+botonColeccion.addEventListener ('click', () => {
+    showArray()
+
+    // FILTRAR COLECCIÓN 
+    // A a Z
+    let botonFiltroAlfabetico = document.getElementById("filtroAlfabetico")
+
+    botonFiltroAlfabetico.addEventListener('click', () => {
+        coleccionLibros.innerHTML = ' '
+        arrayLibros.sort(function(a, b){
+            if(a.titulo < b.titulo) { return -1; }
+            if(a.titulo > b.titulo) { return 1; }
+            return 0;
+        })
+        showArray()
+    })
+
+    // ESTADO LECTURA
+    let botonFiltroLectura = document.getElementById("filtroLectura")
+
+    botonFiltroLectura.addEventListener('click', () => {
+        coleccionLibros.innerHTML = ' '
+        arrayLibros.sort(function(a,b) {
+            if(a.estado < b.estado) {return 1;}
+            if(a.estado > b.estado) {return -1;} 
+            return 0
+        })
+        showArray()
+    })
 })
 
+// ELIMINAR COLECCION
 let botonEliminarColeccion = document.getElementById("btnEliminarColeccion")
 
 botonEliminarColeccion.addEventListener('click', () => {
@@ -99,8 +169,11 @@ botonEliminarColeccion.addEventListener('click', () => {
                 icon: "success",
             })
             localStorage.removeItem('libros')
+            setTimeout(function(){location.reload()}, 2500)
         }
     })
 })
+
+
 
 
